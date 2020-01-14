@@ -1,9 +1,6 @@
 import numpy
 import serial
-import scipy.signal as signal
 import scipy.io.wavfile as wavfile
-
-import matplotlib.pyplot as plt
 
 port         = 'com4'
 baudRate     = 12_000_000
