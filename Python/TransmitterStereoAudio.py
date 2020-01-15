@@ -4,11 +4,11 @@ import scipy.signal as signal
 import scipy.ndimage.interpolation as interpolation
 import scipy.io.wavfile as wavfile
 
-port          = 'com4'
-filename      = '..\Data\Messiah.wav'
+#filename      = '..\Data\Messiah.wav'
 #filename      = '..\Data\WhenJohnnyComes.wav'
-#filename      = '..\Data\TallShips.wav'
+filename      = '..\Data\TallShips.wav'
 
+port          = 'com4'
 baudRate      = 12_000_000
 blockSize     = 3
 scale         = 2 ** 21     # 75 kHz frequency deviation
@@ -39,12 +39,7 @@ waveR = interpolation.zoom(waveR, zoom = resampleScale, order = 3)
 
 print('Normalizing...')
 
-minL = numpy.abs(waveL.min())
-maxL = numpy.abs(waveL.max())
-minR = numpy.abs(waveR.min())
-maxR = numpy.abs(waveR.max())
-
-div = max(minL, maxL, minR, maxR)
+div = max(numpy.abs(waveL).max(), numpy.abs(waveR).max())
 
 waveL = waveL / div
 waveR = waveR / div
@@ -59,7 +54,7 @@ wave = 0.9 * ((waveL + waveR) / 2.0 + s38 * (waveL - waveR) / 2.0) + 0.1 * s19
 
 print('Signal conditioning...')
 
-wave = wave / max(numpy.abs(wave.min()), numpy.abs(wave.max()))
+wave = wave / numpy.abs(wave).max()
 wave = (wave * 0.5) * scale + (2. ** (8 * blockSize - 1))
 
 print('Generating bytestream...')
