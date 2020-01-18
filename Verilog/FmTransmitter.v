@@ -19,8 +19,8 @@ module FmTransmitter(clkSlow, clkFast, uart, reset, rf);
     wire         uartAavailable;
     wire [7 : 0] uartData;
     
-    wire                         demuxAvailable;
-    wire [8 * blockSize - 1 : 0] demuxData;
+    wire                         deserializedAvailable;
+    wire [8 * blockSize - 1 : 0] deserializedData;
 
     reg [phaseBits - 1 : 0] phase = 0;
     reg [phaseBits - 1 : 0] phaseDelta = 0;
@@ -29,12 +29,12 @@ module FmTransmitter(clkSlow, clkFast, uart, reset, rf);
 
     always @(posedge clkSlow)
     begin
-        phaseDelta <= frequencyPhaseDelta + demuxData;
+        phaseDelta <= frequencyPhaseDelta + deserializedData;
     end
     
     always @(posedge clkFast)
     begin
-        phase <= phase + phaseDelta;// + demuxData << (bandwidth - (8 * blockSize));
+        phase <= phase + phaseDelta;
     end
 
     UartRx #
@@ -50,17 +50,17 @@ module FmTransmitter(clkSlow, clkFast, uart, reset, rf);
         .data(uartData)
     );
 
-    Demux #
+    Deserializer #
     (
         .blockSize(blockSize)
     )
-    demux
+    deserializer
     (
         .clk(clkSlow), 
         .reset(reset),
         .enable(uartAvailable), 
         .inData(uartData), 
         .available(demuxAvailable), 
-        .outData(demuxData)
+        .outData(deserializedData)
     );
 endmodule
